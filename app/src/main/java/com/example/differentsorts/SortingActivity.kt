@@ -1,25 +1,29 @@
 package com.example.differentsorts
 
+import android.animation.ArgbEvaluator
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Handler
-import android.util.Log
 import android.widget.TextView
 import com.example.differentsorts.databinding.ActivitySortingBinding
 import kotlinx.coroutines.*
-import java.util.*
 import kotlin.collections.ArrayList
 
+@DelicateCoroutinesApi
 class SortingActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySortingBinding
+
+    private lateinit var timer: Timer
 
     companion object {
         const val SORTING_NAME = "sort_name"
         const val SIZE = 20
     }
+
+    private var currentIterationStep = 0
 
     private var mainListOfDigits = ArrayList<Int>()
     private val sorting = Sort()
@@ -55,67 +59,81 @@ class SortingActivity : AppCompatActivity() {
     private fun sortButtonClick() {
         binding.buttonSort.setOnClickListener {
             sorting.sortingSteps.clear()
-            if (binding.nameOfSorting.text.toString() == "QUICK SORT") {
+            if (binding.nameOfSorting.text.toString() == this.getString(R.string.quicksortButtonText)) {
                 val left = 0
                 val right = SIZE - 1
-                sorting.quickSort(mainListOfDigits, left, right)
 
+                GlobalScope.launch(Dispatchers.IO) {
+                    sorting.quickSort(mainListOfDigits, left, right)
+                }.invokeOnCompletion {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        animationOfSorting()
+                    }
+                }
             }
-            animationOfSorting()
         }
-
-
     }
 
     private fun animationOfSorting() {
-        val idOfDigits = ArrayList<Int>()
-        for (digit in binding.digits.referencedIds) {
-            idOfDigits.add(digit)
-        }
-        var counter = 0
-        while (counter != sorting.sortingSteps.size - 1) {
-            object : CountDownTimer(3000, 3000) {
-                override fun onTick(millisUntilFinished: Long) {
-                    val pair = Pair(
-                        sorting.sortingSteps[counter].firstIndex,
-                        sorting.sortingSteps[counter].secondIndex
-                    )
-                    val firstDigit: TextView = findViewById(idOfDigits[pair.first])
-                    val secondDigit: TextView = findViewById(idOfDigits[pair.second])
-                    firstDigit.setTextColor(Color.RED)
-                    secondDigit.setTextColor(Color.RED)
-                    Handler().postDelayed({
-                        firstDigit.text =
-                            secondDigit.text.also { secondDigit.text = firstDigit.text }
-                    }, 1000)
-                    Handler().postDelayed({
-                        firstDigit.setTextColor(resources.getColor(R.color.textColor, theme))
-                        secondDigit.setTextColor(resources.getColor(R.color.textColor, theme))
-                    }, 2000)
-                }
-
-                override fun onFinish() {
-                }
-            }.start()
-            counter++
-        }
-
-
+        timer = Timer(::processSortingSteps)
+        timer.start()
     }
 
-//    private suspend fun animation(firstDigit: TextView, secondDigit: TextView) {
-//       withContext(Dispatchers.IO){
-//            firstDigit.setTextColor(Color.RED)
-//            secondDigit.setTextColor(Color.RED)
-//            delay(1000L)
-//            firstDigit.text = secondDigit.text.also { secondDigit.text = firstDigit.text }
-//            delay(1000L)
-//            firstDigit.setTextColor(resources.getColor(R.color.textColor, theme))
-//            secondDigit.setTextColor(resources.getColor(R.color.textColor, theme))
-//            delay(1000L) }
-//
-//    }
+    private fun processSortingSteps() {
+        if (currentIterationStep < sorting.sortingSteps.size) {
+            lateinit var firstTextView: TextView
+            lateinit var secondTextView: TextView
 
+            val currentSortingStep = sorting.sortingSteps[currentIterationStep]
+
+            with(binding.digits.referencedIds) {
+                firstTextView = binding.root.findViewById(this[currentSortingStep.firstIndex])
+                secondTextView = binding.root.findViewById(this[currentSortingStep.secondIndex])
+            }
+
+            animateTextColor(
+                firstTextView,
+                this@SortingActivity.getColor(R.color.textColor),
+                Color.RED
+            )
+            animateTextColor(
+                secondTextView,
+                this@SortingActivity.getColor(R.color.textColor),
+                Color.RED
+            )
+
+            firstTextView.text =
+                secondTextView.text.also { secondTextView.text = firstTextView.text }
+
+            animateTextColor(
+                firstTextView,
+                Color.RED,
+                this@SortingActivity.getColor(R.color.textColor)
+            )
+            animateTextColor(
+                secondTextView,
+                Color.RED,
+                this@SortingActivity.getColor(R.color.textColor)
+            )
+
+            currentIterationStep++
+        } else {
+            timer.cancel()
+            currentIterationStep = 0
+        }
+    }
+
+    private fun animateTextColor(textView: TextView, previousColor: Int, newColor: Int) {
+        val textColorAnimation = ObjectAnimator.ofInt(
+            textView, "textColor",
+            previousColor,
+            newColor
+        )
+
+        textColorAnimation.duration = 700
+        textColorAnimation.setEvaluator(ArgbEvaluator())
+        textColorAnimation.start()
+    }
 
     private fun backButtonClick() {
         binding.backButton.setOnClickListener {
@@ -125,12 +143,22 @@ class SortingActivity : AppCompatActivity() {
     }
 
 
-    private fun makeRandomDigits(): ArrayList<Int> {
-        val list = ArrayList<Int>()
+    private fun makeRandomDigits(): java.util.ArrayList<Int> {
+        val list = java.util.ArrayList<Int>()
         for (i in 0 until SIZE) {
             list.add((0..100).random())
         }
         return list
+    }
+
+    internal class Timer(private val methodToExecute: () -> Unit) :
+        CountDownTimer(Int.MAX_VALUE.toLong(), 300) {
+
+        override fun onTick(millisUntilFinished: Long) {
+            methodToExecute.invoke()
+        }
+
+        override fun onFinish() {}
     }
 
 
