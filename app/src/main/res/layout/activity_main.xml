@@ -16,6 +16,7 @@
         android:autoSizeStepGranularity="1sp"
         android:autoSizeTextType="uniform"
         android:fontFamily="serif-monospace"
+        android:gravity="center"
         android:lines="1"
         android:paddingStart="20dp"
         android:paddingTop="10dp"
@@ -27,20 +28,21 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.14" />
+        app:layout_constraintVertical_bias="0.044" />
 
     <Button
         android:id="@+id/quicksortButton"
         style="@style/selectorButtonsStyle"
+        android:layout_marginTop="1dp"
         android:fontFamily="sans-serif-condensed-light"
         android:text="@string/quicksortButtonText"
         app:layout_constraintBottom_toTopOf="@+id/heapsortButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/header"
         app:layout_constraintVertical_chainStyle="packed"
         tools:ignore="TouchTargetSizeCheck" />
 
@@ -71,25 +73,11 @@
         style="@style/selectorButtonsStyle"
         android:fontFamily="sans-serif-condensed-light"
         android:text="@string/bubblesortButtonText"
-        app:layout_constraintBottom_toTopOf="@+id/guideline3"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mergesortButton"
         tools:ignore="TouchTargetSizeCheck" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="341dp" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_end="145dp" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/selectorButtonsGroup"
