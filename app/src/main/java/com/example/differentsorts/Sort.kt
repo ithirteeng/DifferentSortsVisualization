@@ -1,10 +1,12 @@
 package com.example.differentsorts
 
-class SortLogic {
-    fun quickSort(list: MutableList<Int>, left: Int, right: Int): Pair<Int, Int> {
+class Sort {
+    var sortingSteps = ArrayList<SortingStep>()
+
+    fun quickSort(list: ArrayList<Int>, left: Int, right: Int) {
         var l = left
         var r = right
-        var middle = (list[left] + list[right] + list[(left + right) / 2]) / 3
+        val middle = (list[left] + list[right] + list[(left + right) / 2]) / 3
 
         while (l <= r) {
             while(list[l] < middle) {
@@ -15,13 +17,18 @@ class SortLogic {
             }
 
             if (l <= r) {
-                val temp = list[l]
-                list[l] = list[r]
-                list[r] = temp
+                list[l] = list[r].also { list[r] = list[l] }
+                sortingSteps.add(SortingStep(l, r))
                 l++
                 r--
             }
         }
-        return Pair(l, r)
+
+        if (r > left) {
+            quickSort(list, left, r)
+        }
+        if (l < right) {
+            quickSort(list, l, right)
+        }
     }
 }

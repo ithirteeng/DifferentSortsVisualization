@@ -1,3 +1,6 @@
 package com.example.differentsorts
 
-data class SortingStep()
+data class SortingStep(
+    val firstIndex: Int,
+    val secondIndex: Int
+)

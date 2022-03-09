@@ -1,2 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <dimen name="headerTextSize">25sp</dimen>
+    <dimen name="minTextSize">1sp</dimen>
+    <dimen name="maxTextSize">100sp</dimen>
+    <dimen name="stepTextSize">1sp</dimen>
+    <dimen name="topPadding">5dp</dimen>
+    <dimen name="startPadding">10dp</dimen>
+    <dimen name="topMargin">10dp</dimen>
+    <dimen name="startMargin">40dp</dimen>
+    <dimen name="digitsTextSize">20sp</dimen>
+</resources>

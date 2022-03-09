@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Different Sorts</string>
+    <string name="headerText">Select the type of sorting</string>
+    <string name="quicksortButtonText">QUICK SORT</string>
+    <string name="bubblesortButtonText">BUBBLE SORT</string>
+    <string name="mergesortButtonText">MERGE SORT</string>
+    <string name="heapsortButtonText">HEAP SORT</string>
+    <string name="randomButtonText">RANDOM</string>
+    <string name="sortButtonText">SORT</string>
+    <string name="digitsStart">.</string>
+    <string name="backButtonText">BACK</string>
 </resources>
