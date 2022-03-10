@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.widget.TextView
+import android.widget.Toast
 import com.example.differentsorts.databinding.ActivitySortingBinding
 import kotlinx.coroutines.*
 import kotlin.collections.ArrayList
@@ -58,18 +59,46 @@ class SortingActivity : AppCompatActivity() {
 
     private fun sortButtonClick() {
         binding.buttonSort.setOnClickListener {
-            sorting.sortingSteps.clear()
-            if (binding.nameOfSorting.text.toString() == this.getString(R.string.quicksortButtonText)) {
-                val left = 0
-                val right = SIZE - 1
+            if (binding.fifthView.text.toString() != ".") {
+                sorting.sortingSteps.clear()
+                
+                if (binding.nameOfSorting.text.toString() == this.getString(R.string.quicksortButtonText)) {
+                    val left = 0
+                    val right = SIZE - 1
 
-                GlobalScope.launch(Dispatchers.IO) {
-                    sorting.quickSort(mainListOfDigits, left, right)
-                }.invokeOnCompletion {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        animationOfSorting()
+                    GlobalScope.launch(Dispatchers.IO) {
+                        sorting.quickSort(mainListOfDigits, left, right)
+                    }.invokeOnCompletion {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            animationOfSorting()
+                        }
                     }
                 }
+                else if (binding.nameOfSorting.text.toString() == this.getString(R.string.heapsortButtonText)) {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        sorting.heapSort(mainListOfDigits, SIZE)
+                    }.invokeOnCompletion {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            animationOfSorting()
+                        }
+                    }
+                }
+                else if (binding.nameOfSorting.text.toString() == this.getString(R.string.mergesortButtonText)) {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        sorting.mergeSort(mainListOfDigits, SIZE, 0, SIZE)
+                    }.invokeOnCompletion {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            animationOfSorting()
+                        }
+                    }
+                } else {
+
+                }
+            } else {
+                Toast.makeText(this,
+                    "Please, press \"RANDOM\" button",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -77,6 +106,8 @@ class SortingActivity : AppCompatActivity() {
     private fun animationOfSorting() {
         timer = Timer(::processSortingSteps)
         timer.start()
+        binding.buttonSort.isEnabled = false
+        binding.randomButton.isEnabled = false
     }
 
     private fun processSortingSteps() {
@@ -119,6 +150,8 @@ class SortingActivity : AppCompatActivity() {
             currentIterationStep++
         } else {
             timer.cancel()
+            binding.buttonSort.isEnabled = true
+            binding.randomButton.isEnabled = true
             currentIterationStep = 0
         }
     }
@@ -130,7 +163,7 @@ class SortingActivity : AppCompatActivity() {
             newColor
         )
 
-        textColorAnimation.duration = 700
+        textColorAnimation.duration = 500
         textColorAnimation.setEvaluator(ArgbEvaluator())
         textColorAnimation.start()
     }
@@ -152,7 +185,7 @@ class SortingActivity : AppCompatActivity() {
     }
 
     internal class Timer(private val methodToExecute: () -> Unit) :
-        CountDownTimer(Int.MAX_VALUE.toLong(), 300) {
+        CountDownTimer(Int.MAX_VALUE.toLong(), 400) {
 
         override fun onTick(millisUntilFinished: Long) {
             methodToExecute.invoke()
